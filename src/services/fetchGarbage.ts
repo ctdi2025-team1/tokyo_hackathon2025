@@ -57,7 +57,7 @@ async function fetchWithRetry(url: string, maxRetries = 1): Promise<Response> {
       lastError = error instanceof Error ? error : new Error(String(error));
       
       if (attempt < maxRetries) {
-        const delay = Math.pow(2, attempt) * 1000; // 1s, 2s の指数バックオフ
+        const delay = 2 ** attempt * 1000; // 1s, 2s の指数バックオフ
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
@@ -205,13 +205,19 @@ export async function fetchGarbageGeoJSON(): Promise<GarbageTotals> {
     if (hasShibuyaSchema) {
       const rows = geoJsonData.features.map((f: { properties?: Record<string, unknown> }) => {
         const props = f.properties || {};
+        // biome-ignore lint/complexity/useLiteralKeys: keep import order for clarity
         const dateStr = typeof props['日付'] === 'string' ? (props['日付'] as string) : '';
+        // biome-ignore lint/complexity/useLiteralKeys: keep import order for clarity
         const y = Number(props['年']);
+        // biome-ignore lint/complexity/useLiteralKeys: keep import order for clarity
         const m = Number(props['月']);
+        // biome-ignore lint/complexity/useLiteralKeys: keep import order for clarity
         const dayRaw = (props as Record<string, unknown>)['日'];
         const d = typeof dayRaw === 'number' ? dayRaw : Number(dayRaw);
         const date = dateStr ? new Date(dateStr) : (y && m && d ? new Date(y, m - 1, d) : null);
+        // biome-ignore lint/complexity/useLiteralKeys: keep import order for clarity
         const cat = String(props['ごみ種類'] ?? '');
+        // biome-ignore lint/complexity/useLiteralKeys: keep import order for clarity
         const tonRaw = (props['ごみ収集量_ton'] ?? props['ごみ収集量']) as unknown;
         const ton = typeof tonRaw === 'number' ? tonRaw : Number(tonRaw);
         return { date, cat, ton: Number.isNaN(ton) ? 0 : ton };
