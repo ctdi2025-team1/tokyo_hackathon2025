@@ -107,9 +107,6 @@ const GarbageCard: React.FC = () => {
   // Always use green for target line and label for better recognition
   const lineColor = theme.palette.success.main;
 
-  // 最終更新日の表示（共通ユーティリティを使用）
-  const formatLastUpdated = (isoString: string) => formatIsoToDateTimeJP(isoString);
-
   return (
     <Card elevation={2} sx={{ borderRadius: 2 }}>
       <CardContent>
@@ -120,7 +117,7 @@ const GarbageCard: React.FC = () => {
               ごみ排出量
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              最新: {formatLastUpdated(garbageData.lastUpdated)}
+              最新: {formatIsoToDateTimeJP(garbageData.lastUpdated)}
             </Typography>
           </Box>
         </Box>

@@ -51,6 +51,20 @@ interface EventListProps {
   maxItems?: number;
 }
 
+// 並び順: 親子向け優先 → 開始時刻 → 区
+const compareEvents = (a: Event, b: Event) => {
+  if (a.forFamily !== b.forFamily) {
+    return b.forFamily ? 1 : -1;
+  }
+  if (a.startTime && b.startTime) {
+    return a.startTime.localeCompare(b.startTime);
+  }
+  if (a.ward && b.ward) {
+    return a.ward.localeCompare(b.ward);
+  }
+  return 0;
+};
+
 const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -160,19 +174,9 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
       ];
 
       setTimeout(() => {
-        // Sort: family-friendly first, then by start time, then by ward
-        const sortedEvents = mockEvents.sort((a, b) => {
-          if (a.forFamily !== b.forFamily) {
-            return b.forFamily ? 1 : -1;
-          }
-          if (a.startTime && b.startTime) {
-            return a.startTime.localeCompare(b.startTime);
-          }
-          if (a.ward && b.ward) {
-            return a.ward.localeCompare(b.ward);
-          }
-          return 0;
-        }).slice(0, maxItems);
+        const sortedEvents = mockEvents
+          .sort(compareEvents)
+          .slice(0, maxItems);
 
         setEvents(sortedEvents);
         setLastUpdated(new Date().toISOString());
@@ -188,9 +192,7 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
     fetchEvents();
   }, [fetchEvents]);
 
-  const formatTime = (time: string) => formatTimeHHmm(time);
-
-  const formatLastUpdated = (isoString: string) => formatIsoToShortJP(isoString);
+  // 直接ユーティリティを使用（薄いラッパーを削除）
 
   const getSourceLabel = (source: string) => {
     const labels = {
@@ -251,7 +253,7 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
         <Box display="flex" alignItems="center" gap={1}>
           {lastUpdated && (
             <Typography variant="caption" color="text.secondary">
-              最終更新: {formatLastUpdated(lastUpdated)}
+              最終更新: {formatIsoToShortJP(lastUpdated)}
             </Typography>
           )}
           <Button
@@ -347,8 +349,8 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
                       <Box display="flex" alignItems="center" gap={0.5}>
                         <Schedule fontSize="small" color="action" />
                         <Typography variant="body2" color="text.secondary">
-                          {formatTime(event.startTime)}
-                          {event.endTime && ` - ${formatTime(event.endTime)}`}
+                          {formatTimeHHmm(event.startTime)}
+                          {event.endTime && ` - ${formatTimeHHmm(event.endTime)}`}
                         </Typography>
                       </Box>
                     )}

@@ -92,7 +92,7 @@ function normalizePropertyNames(record: Record<string, unknown>): GarbageRecord 
       normalized.month = Number(value);
     }
     
-    // 可燃ごみ
+    // ごみ種別（単位表記の揺れを吸収）
     else if (/可燃/.test(lowerKey) || /burnable/.test(lowerKey)) {
       const num = Number(value) || 0;
       if (lowerKey.includes('kg') || lowerKey.includes('キロ')) {
@@ -103,8 +103,6 @@ function normalizePropertyNames(record: Record<string, unknown>): GarbageRecord 
         normalized.burnable = num;
       }
     }
-    
-    // 不燃ごみ
     else if (/不燃/.test(lowerKey) || /nonburnable/.test(lowerKey)) {
       const num = Number(value) || 0;
       if (lowerKey.includes('kg') || lowerKey.includes('キロ')) {
@@ -115,8 +113,6 @@ function normalizePropertyNames(record: Record<string, unknown>): GarbageRecord 
         normalized.nonBurnable = num;
       }
     }
-    
-    // 粗大ごみ
     else if (/粗大/.test(lowerKey) || /bulky/.test(lowerKey)) {
       const num = Number(value) || 0;
       if (lowerKey.includes('kg') || lowerKey.includes('キロ')) {
