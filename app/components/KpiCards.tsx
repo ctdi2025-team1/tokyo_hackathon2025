@@ -22,16 +22,15 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface KpiData {
-  burnable_gpd: number;
-  non_burnable_gpd: number;
-  bulky_gpd: number;
+  household_gpd: number;
+  recycling_gpd: number;
   deltas: {
-    burnable: number;
-    non_burnable: number;
-    bulky: number;
+    household: number;
+    recycling: number;
   };
   lastUpdated: string;
   sources: string[];
+  breakdown?: Record<string, number>;
 }
 
 const KpiCards: React.FC = () => {
@@ -48,21 +47,26 @@ const KpiCards: React.FC = () => {
       // const response = await fetch('/api/kpi/shibuya');
       // const data = await response.json();
       
-      // Mock data for development with zero values as requested
+      // Mock data for development - using realistic values
       const mockData: KpiData = {
-        burnable_gpd: 0,
-        non_burnable_gpd: 0,
-        bulky_gpd: 0,
+        household_gpd: 315.7,
+        recycling_gpd: 127.3,
         deltas: {
-          burnable: 0,
-          non_burnable: 0,
-          bulky: 0,
+          household: -12.4,
+          recycling: 8.9,
         },
         lastUpdated: new Date().toISOString(),
         sources: [
           'https://city-shibuya-data.opendata.arcgis.com/',
           'https://www.city.shibuya.tokyo.jp/kurashi/gomi/',
         ],
+        breakdown: {
+          'ペットボトル': 23.5,
+          '紙類': 45.2,
+          'びん': 18.7,
+          '缶': 21.3,
+          'プラ容器包装': 18.6,
+        },
       };
       
       setTimeout(() => {
@@ -130,28 +134,20 @@ const KpiCards: React.FC = () => {
   // Chart data for bar visualization with targets for each waste type
   const chartData = [
     {
-      name: '🔥 燃えるごみ',
-      value: kpiData.burnable_gpd,
-      target: 400,
-      delta: kpiData.deltas.burnable,
+      name: '🏠 家庭ごみ',
+      value: kpiData.household_gpd,
+      target: 250,
+      delta: kpiData.deltas.household,
       color: '#ff6b6b',
       targetColor: '#ff8e53'
     },
     {
-      name: '🧱 燃えないごみ',
-      value: kpiData.non_burnable_gpd,
-      target: 50,
-      delta: kpiData.deltas.non_burnable,
+      name: '♻️ 資源回収',
+      value: kpiData.recycling_gpd,
+      target: 150,
+      delta: kpiData.deltas.recycling,
       color: '#4ecdc4',
       targetColor: '#45b7aa'
-    },
-    {
-      name: '📦 粗大ゴミ',
-      value: kpiData.bulky_gpd,
-      target: 30,
-      delta: kpiData.deltas.bulky,
-      color: '#ffe66d',
-      targetColor: '#ffb74d'
     }
   ];
 
@@ -242,112 +238,105 @@ const KpiCards: React.FC = () => {
         {/* KPI Cards */}
         <Box sx={{ width: '100%' }}>
           <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
-            {/* 可燃ごみカード */}
-            <Card sx={{ flex: 1, border: '2px solid #ff6b6b', borderRadius: '12px' }}>
+            {/* 家庭ごみカード */}
+            <Card sx={{ 
+              flex: 1, 
+              background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)', 
+              color: 'white',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(255, 107, 107, 0.3)',
+              border: 'none',
+            }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                  <Typography variant="h6" component="h3" sx={{ color: '#ff6b6b', fontWeight: 'bold' }}>
-                    🔥 燃えるごみ
+                  <Typography variant="h6" component="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
+                    🏠 家庭ごみ
                   </Typography>
-                  <Tooltip title="目標: 400g">
-                    <Info fontSize="small" color="action" />
+                  <Tooltip title="目標: 250g/人・日（2033年まで）">
+                    <Info fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} />
                   </Tooltip>
                 </Box>
                 
-                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
-                  {kpiData.burnable_gpd.toFixed(1)}
-                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
-                    グラム
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: 'white' }}>
+                  {kpiData.household_gpd.toFixed(1)}
+                  <Typography variant="body2" component="span" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} ml={1}>
+                    g/人・日
                   </Typography>
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                   <Chip
-                    icon={getTrendIcon(kpiData.deltas.burnable)}
-                    label={`前回より ${kpiData.deltas.burnable > 0 ? '+' : ''}${kpiData.deltas.burnable.toFixed(1)}g`}
+                    icon={getTrendIcon(kpiData.deltas.household)}
+                    label={`前回より ${kpiData.deltas.household > 0 ? '+' : ''}${kpiData.deltas.household.toFixed(1)}g`}
                     size="small"
-                    color={getTrendColor(kpiData.deltas.burnable)}
+                    sx={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      color: 'white',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      '& .MuiChip-icon': { color: 'white' }
+                    }}
                     variant="outlined"
                   />
                   <Chip
-                    label={`目標まで あと${(400 - kpiData.burnable_gpd).toFixed(1)}g`}
+                    label={`目標まで あと${(kpiData.household_gpd - 250).toFixed(1)}g`}
                     size="small"
-                    color={kpiData.burnable_gpd <= 400 ? 'success' : 'warning'}
-                    variant="filled"
+                    sx={{ 
+                      backgroundColor: kpiData.household_gpd <= 250 ? 'rgba(76, 175, 80, 0.9)' : 'rgba(255, 193, 7, 0.9)',
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}
                   />
                 </Box>
               </CardContent>
             </Card>
 
-            {/* 不燃ごみカード */}
-            <Card sx={{ flex: 1, border: '2px solid #4ecdc4', borderRadius: '12px' }}>
+            {/* 資源回収カード */}
+            <Card sx={{ 
+              flex: 1, 
+              background: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)', 
+              color: 'white',
+              borderRadius: '16px',
+              boxShadow: '0 8px 32px rgba(78, 205, 196, 0.3)',
+              border: 'none',
+            }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                  <Typography variant="h6" component="h3" sx={{ color: '#4ecdc4', fontWeight: 'bold' }}>
-                    🧱 燃えないごみ
+                  <Typography variant="h6" component="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
+                    ♻️ 資源回収
                   </Typography>
-                  <Tooltip title="目標: 50g">
-                    <Info fontSize="small" color="action" />
+                  <Tooltip title="目標: 150g/人・日（リサイクル率向上）">
+                    <Info fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} />
                   </Tooltip>
                 </Box>
                 
-                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
-                  {kpiData.non_burnable_gpd.toFixed(1)}
-                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
-                    グラム
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: 'white' }}>
+                  {kpiData.recycling_gpd.toFixed(1)}
+                  <Typography variant="body2" component="span" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} ml={1}>
+                    g/人・日
                   </Typography>
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                   <Chip
-                    icon={getTrendIcon(kpiData.deltas.non_burnable)}
-                    label={`前回より ${kpiData.deltas.non_burnable > 0 ? '+' : ''}${kpiData.deltas.non_burnable.toFixed(1)}g`}
+                    icon={getTrendIcon(kpiData.deltas.recycling)}
+                    label={`前回より ${kpiData.deltas.recycling > 0 ? '+' : ''}${kpiData.deltas.recycling.toFixed(1)}g`}
                     size="small"
-                    color={getTrendColor(kpiData.deltas.non_burnable)}
+                    sx={{ 
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      color: 'white',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      '& .MuiChip-icon': { color: 'white' }
+                    }}
                     variant="outlined"
                   />
                   <Chip
-                    label={`目標まで あと${(50 - kpiData.non_burnable_gpd).toFixed(1)}g`}
+                    label={`目標まで ${kpiData.recycling_gpd >= 150 ? '達成' : `あと${(150 - kpiData.recycling_gpd).toFixed(1)}g`}`}
                     size="small"
-                    color={kpiData.non_burnable_gpd <= 50 ? 'success' : 'warning'}
-                    variant="filled"
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-
-            {/* 粗大ごみカード */}
-            <Card sx={{ flex: 1, border: '2px solid #ffe66d', borderRadius: '12px' }}>
-              <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                  <Typography variant="h6" component="h3" sx={{ color: '#ff8f00', fontWeight: 'bold' }}>
-                    📦 粗大ごみ
-                  </Typography>
-                  <Tooltip title="目標: 30g">
-                    <Info fontSize="small" color="action" />
-                  </Tooltip>
-                </Box>
-                
-                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
-                  {kpiData.bulky_gpd.toFixed(1)}
-                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
-                    グラム
-                  </Typography>
-                </Typography>
-
-                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
-                  <Chip
-                    icon={getTrendIcon(kpiData.deltas.bulky)}
-                    label={`前回より ${kpiData.deltas.bulky > 0 ? '+' : ''}${kpiData.deltas.bulky.toFixed(1)}g`}
-                    size="small"
-                    color={getTrendColor(kpiData.deltas.bulky)}
-                    variant="outlined"
-                  />
-                  <Chip
-                    label={`目標まで あと${(30 - kpiData.bulky_gpd).toFixed(1)}g`}
-                    size="small"
-                    color={kpiData.bulky_gpd <= 30 ? 'success' : 'warning'}
-                    variant="filled"
+                    sx={{ 
+                      backgroundColor: kpiData.recycling_gpd >= 150 ? 'rgba(76, 175, 80, 0.9)' : 'rgba(33, 150, 243, 0.9)',
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}
                   />
                 </Box>
               </CardContent>

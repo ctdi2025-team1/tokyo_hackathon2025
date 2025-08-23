@@ -2,7 +2,6 @@
 
 // biome-ignore assist/source/organizeImports: manual import order for readability
 import type React from 'react';
-import { useState } from 'react';
 
 import {
   Chat as ChatIcon,
@@ -26,7 +25,7 @@ import {
 import Chat from './components/Chat';
 import EventList from './components/EventList';
 import KpiCards from './components/KpiCards';
-import ResourceChips from './components/ResourceChips';
+import ResourcePieChart from './components/ResourceChips';
 
 interface ScrollToTopProps {
   children: React.ReactElement;
@@ -61,9 +60,6 @@ function ScrollToTop({ children }: ScrollToTopProps) {
 }
 
 export default function Home() {
-  const [selectedResourceCategories, setSelectedResourceCategories] = useState<string[]>([
-    'pet', 'paper', 'glass', 'can', 'plastic'
-  ]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -79,17 +75,11 @@ export default function Home() {
       {/* App Bar */}
       <AppBar 
         position="sticky" 
-        elevation={1}
-        sx={{ 
-          bgcolor: 'background.paper', 
-          color: 'text.primary',
-          borderBottom: 1,
-          borderColor: 'divider',
-        }}
+        elevation={2}
       >
         <Toolbar>
-          <Dashboard sx={{ mr: 2 }} color="primary" />
-          <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 'medium' }}>
+          <Dashboard sx={{ mr: 2, color: '#FFFFFF' }} />
+          <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 'bold', color: '#FFFFFF' }}>
           （仮）「渋谷ダッシュボード＋イベント」
           </Typography>
           <Box display={{ xs: 'none', sm: 'flex' }} gap={2}>
@@ -101,8 +91,16 @@ export default function Home() {
                 background: 'none', 
                 border: 'none', 
                 cursor: 'pointer',
-                '&:hover': { textDecoration: 'underline' },
-                color: 'inherit',
+                '&:hover': { 
+                  textDecoration: 'underline',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: 1,
+                },
+                color: '#FFFFFF',
+                fontWeight: 'medium',
+                px: 2,
+                py: 1,
+                transition: 'all 0.2s ease-in-out',
               }}
             >
               先週のゴミの量を確認
@@ -115,8 +113,16 @@ export default function Home() {
                 background: 'none', 
                 border: 'none', 
                 cursor: 'pointer',
-                '&:hover': { textDecoration: 'underline' },
-                color: 'inherit',
+                '&:hover': { 
+                  textDecoration: 'underline',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: 1,
+                },
+                color: '#FFFFFF',
+                fontWeight: 'medium',
+                px: 2,
+                py: 1,
+                transition: 'all 0.2s ease-in-out',
               }}
             >
               イベント
@@ -129,8 +135,16 @@ export default function Home() {
                 background: 'none', 
                 border: 'none', 
                 cursor: 'pointer',
-                '&:hover': { textDecoration: 'underline' },
-                color: 'inherit',
+                '&:hover': { 
+                  textDecoration: 'underline',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: 1,
+                },
+                color: '#FFFFFF',
+                fontWeight: 'medium',
+                px: 2,
+                py: 1,
+                transition: 'all 0.2s ease-in-out',
               }}
             >
               AI質問
@@ -163,24 +177,32 @@ export default function Home() {
         {/* KPI Section */}
         <Paper 
           id="kpi-section" 
-          elevation={0} 
+          elevation={1} 
           sx={{ 
             p: 4, 
             mb: 4, 
-            bgcolor: 'grey.50',
+            background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.03) 0%, rgba(66, 165, 245, 0.08) 100%)',
             borderRadius: 3,
+            border: '1px solid rgba(25, 118, 210, 0.12)',
           }}
         >
           <KpiCards />
         </Paper>
 
         {/* Resource Breakdown Section */}
-        <Box id="resource-section" mb={4}>
-          <ResourceChips
-            selectedCategories={selectedResourceCategories}
-            onCategorySelect={setSelectedResourceCategories}
-          />
-        </Box>
+        <Paper 
+          id="resource-section" 
+          elevation={1} 
+          sx={{ 
+            p: 4, 
+            mb: 4, 
+            background: 'linear-gradient(135deg, rgba(255, 64, 129, 0.03) 0%, rgba(255, 128, 171, 0.08) 100%)',
+            borderRadius: 3,
+            border: '1px solid rgba(255, 64, 129, 0.12)',
+          }}
+        >
+          <ResourcePieChart title="資源ごみ内訳" />
+        </Paper>
 
         <Divider sx={{ my: 4 }} />
 

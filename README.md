@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shibuya Civic Tech Dashboard (仮)
 
-## Getting Started
+東京ハッカソン2025で開発している「渋谷区市民向けダッシュボード」のフロントエンドです。
 
-First, run the development server:
+このアプリケーションは、渋谷区のオープンデータを活用し、市民にとってより分かりやすく、便利な情報を提供することを目的としています。環境データや地域イベントの情報を可視化し、AIアシスタントを通じて、市民の疑問に答えます。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 開発の始め方
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1.  依存関係をインストールします:
+    ```bash
+    npm install
+    ```
+2.  開発サーバーを起動します:
+    ```bash
+    npm run dev
+    ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開くと、アプリケーションを確認できます。
+メインページは `app/page.tsx` です。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ 主な機能
 
-## Learn More
+*   **環境KPIダッシュボード:** 渋谷区のゴミ排出量やリサイクル状況をグラフで可視化し、削減目標に対する進捗を確認できます。
+*   **地域イベント一覧:** 区内や周辺地域で開催されるイベント（特に親子向け）を簡単に探せます。
+*   **AIチャット:** ゴミの分別方法、イベント詳細、地域の統計情報などについて、AIに自然な言葉で質問できます。
 
-To learn more about Next.js, take a look at the following resources:
+## 💻 使用技術
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+*   Next.js
+*   React
+*   TypeScript
+*   Material-UI (MUI)
+*   Recharts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧑‍💻 チームメンバー
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*   **フロントエンド:** [あなたの名前]
+*   **バックエンド:** [バックエンド担当者名]

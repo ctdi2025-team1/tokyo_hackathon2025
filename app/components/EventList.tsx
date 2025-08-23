@@ -290,7 +290,7 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
               }}
             >
               <CardContent sx={{ pb: 2 }}>
-                <Box display="flex" justify-content="space-between" alignItems="flex-start" mb={1}>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                   <Typography 
                     variant="h6" 
                     component="h3" 
@@ -347,7 +347,7 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
                   )}
                 </Box>
 
-                <Box display="flex" justify-content="space-between" alignItems="center">
+                <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box display="flex" alignItems="center" gap={2}>
                     {event.startTime && (
                       <Box display="flex" alignItems="center" gap={0.5}>

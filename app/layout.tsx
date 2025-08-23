@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import CustomThemeProvider from './components/ThemeProvider';
+import EmotionRegistry from './components/EmotionRegistry';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +29,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CustomThemeProvider>
-          {children}
-        </CustomThemeProvider>
+        <EmotionRegistry>
+          <CustomThemeProvider>
+            {children}
+          </CustomThemeProvider>
+        </EmotionRegistry>
       </body>
     </html>
   );
