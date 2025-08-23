@@ -1,103 +1,231 @@
-import Image from "next/image";
+'use client';
+
+import type React from 'react';
+import { useState } from 'react';
+
+import {
+  Chat as ChatIcon,
+  Dashboard,
+  Event,
+  KeyboardArrowUp,
+} from '@mui/icons-material';
+import {
+  AppBar,
+  Box,
+  Container,
+  Divider,
+  Fab,
+  Paper,
+  Toolbar,
+  Typography,
+  useScrollTrigger,
+  Zoom,
+} from '@mui/material';
+
+import Chat from './components/Chat';
+import EventList from './components/EventList';
+import KpiCards from './components/KpiCards';
+import ResourceChips from './components/ResourceChips';
+
+interface ScrollToTopProps {
+  children: React.ReactElement;
+}
+
+function ScrollToTop({ children }: ScrollToTopProps) {
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 100,
+  });
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const anchor = ((event.target as HTMLDivElement).ownerDocument || document).querySelector(
+      '#back-to-top-anchor',
+    );
+    if (anchor) {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  return (
+    <Zoom in={trigger}>
+      <Box
+        onClick={handleClick}
+        role="presentation"
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+      >
+        {children}
+      </Box>
+    </Zoom>
+  );
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedResourceCategories, setSelectedResourceCategories] = useState<string[]>([
+    'pet', 'paper', 'glass', 'can', 'plastic'
+  ]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleResourceChipClick = () => {
+    scrollToSection('resource-section');
+  };
+
+  return (
+    <>
+      {/* App Bar */}
+      <AppBar 
+        position="sticky" 
+        elevation={1}
+        sx={{ 
+          bgcolor: 'background.paper', 
+          color: 'text.primary',
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Toolbar>
+          <Dashboard sx={{ mr: 2 }} color="primary" />
+          <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 'medium' }}>
+            渋谷ダッシュボード
+          </Typography>
+          <Box display={{ xs: 'none', sm: 'flex' }} gap={2}>
+            <Typography
+              component="button"
+              variant="button"
+              onClick={() => scrollToSection('kpi-section')}
+              sx={{ 
+                background: 'none', 
+                border: 'none', 
+                cursor: 'pointer',
+                '&:hover': { textDecoration: 'underline' },
+                color: 'inherit',
+              }}
+            >
+              環境KPI
+            </Typography>
+            <Typography
+              component="button"
+              variant="button"
+              onClick={() => scrollToSection('events-section')}
+              sx={{ 
+                background: 'none', 
+                border: 'none', 
+                cursor: 'pointer',
+                '&:hover': { textDecoration: 'underline' },
+                color: 'inherit',
+              }}
+            >
+              イベント
+            </Typography>
+            <Typography
+              component="button"
+              variant="button"
+              onClick={() => scrollToSection('chat-section')}
+              sx={{ 
+                background: 'none', 
+                border: 'none', 
+                cursor: 'pointer',
+                '&:hover': { textDecoration: 'underline' },
+                color: 'inherit',
+              }}
+            >
+              AI質問
+            </Typography>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Scroll to top anchor */}
+      <div id="back-to-top-anchor" />
+
+      {/* Main Content */}
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Hero Section */}
+        <Box textAlign="center" mb={6}>
+          <Typography 
+            variant="h3" 
+            component="h2" 
+            fontWeight="medium" 
+            color="primary" 
+            gutterBottom
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+            渋谷区 環境＆イベント情報
+          </Typography>
+          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+            家庭ごみ・資源回収の最新KPIと今日開催中の親子向けイベントを一覧できるダッシュボード
+          </Typography>
+        </Box>
+
+        {/* KPI Section */}
+        <Paper 
+          id="kpi-section" 
+          elevation={0} 
+          sx={{ 
+            p: 4, 
+            mb: 4, 
+            bgcolor: 'grey.50',
+            borderRadius: 3,
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <KpiCards onResourceChipClick={handleResourceChipClick} />
+        </Paper>
+
+        {/* Resource Breakdown Section */}
+        <Box id="resource-section" mb={4}>
+          <ResourceChips
+            selectedCategories={selectedResourceCategories}
+            onCategorySelect={setSelectedResourceCategories}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </Box>
+
+        <Divider sx={{ my: 4 }} />
+
+        {/* Events Section */}
+        <Box id="events-section" mb={4}>
+          <Box display="flex" alignItems="center" gap={1} mb={3}>
+            <Event color="secondary" />
+            <Typography variant="h4" component="h2" fontWeight="medium">
+              今日のイベント
+            </Typography>
+          </Box>
+          <EventList maxItems={10} />
+        </Box>
+
+        <Divider sx={{ my: 4 }} />
+
+        {/* Chat Section */}
+        <Box id="chat-section" mb={4}>
+          <Box display="flex" alignItems="center" gap={1} mb={3}>
+            <ChatIcon color="primary" />
+            <Typography variant="h4" component="h2" fontWeight="medium">
+              質問・相談
+            </Typography>
+          </Box>
+          <Chat />
+        </Box>
+
+        {/* Footer */}
+        <Box mt={8} pt={4} borderTop={1} borderColor="divider">
+          <Typography variant="body2" color="text.secondary" textAlign="center" mb={2}>
+            © 2025 渋谷ダッシュボード - 公式オープンデータに基づく環境・イベント情報
+          </Typography>
+          <Typography variant="caption" color="text.secondary" textAlign="center" display="block">
+            データ出典: SHIBUYA OPEN DATA, 墨田区オープンデータ, 中央区オープンデータ, 東京ビッグサイト
+          </Typography>
+        </Box>
+      </Container>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop>
+        <Fab size="small" aria-label="トップに戻る">
+          <KeyboardArrowUp />
+        </Fab>
+      </ScrollToTop>
+    </>
   );
 }
