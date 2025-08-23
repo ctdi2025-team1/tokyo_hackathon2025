@@ -127,29 +127,7 @@ const KpiCards: React.FC = () => {
 
 
 
-      {/* 出典リンク */}
-      <Box mt={3}>
-        <Typography variant="caption" color="text.secondary">
-          データ出典:
-          {kpiData.sources.map((source, index) => (
-            <React.Fragment key={source}>
-              {index > 0 && ', '}
-              <Typography
-                component="a"
-                href={source}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="caption"
-                color="primary"
-                sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-                aria-label={`出典リンク ${index + 1}`}
-              >
-                SHIBUYA OPEN DATA
-              </Typography>
-            </React.Fragment>
-          ))}
-        </Typography>
-      </Box>
+      
     </Box>
   );
 };

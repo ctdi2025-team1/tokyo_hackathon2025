@@ -11,7 +11,7 @@ export interface ResourceData {
 // モックデータ用の型（percentage を除外）
 type BaseResourceItem = Omit<ResourceData, 'percentage'>;
 
-// リモートの JSON が未設定の場合に返すモックデータ（逆順）
+// リモートの JSON が未設定の場合に返すモックデータ
 const MOCK_RESOURCE_DATA: BaseResourceItem[] = [
   { id: 'others', name: 'その他', value: 600, color: '#616161' },
   { id: 'glass', name: 'びん', value: 800, color: '#ed6c02' },

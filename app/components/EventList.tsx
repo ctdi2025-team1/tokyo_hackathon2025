@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+// biome-ignore assist/source/organizeImports: keep import order for clarity
+import type React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -183,7 +185,7 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
 
   useEffect(() => {
     fetchEvents();
-  }, [maxItems, fetchEvents]);
+  }, [fetchEvents]);
 
   const formatTime = (time: string) => {
     return time.substring(0, 5); // HH:mm format
@@ -218,7 +220,8 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
           <CircularProgress size={24} />
         </Box>
         {[...Array(3)].map((_, index) => (
-          <Card key={index} sx={{ mb: 2 }}>
+          // biome-ignore lint/suspicious/noArrayIndexKey: keep import order for clarity
+<Card key={index} sx={{ mb: 2 }}>
             <CardContent>
               <Skeleton variant="text" width="80%" height={32} />
               <Skeleton variant="text" width="60%" height={20} />

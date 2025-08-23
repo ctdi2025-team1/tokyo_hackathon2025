@@ -1,4 +1,3 @@
-
 ## 🚀 開発の始め方
 
 1.  依存関係をインストールします:
@@ -26,4 +25,28 @@
 *   TypeScript
 *   Material-UI (MUI)
 *   Recharts
+
+---
+
+## 開発ルール
+
+### セットアップとローカル実行
+```bash
+# 依存関係のインストール (package-lock.jsonに沿う)
+npm ci
+
+# 開発サーバー起動
+npm run dev
+
+# lintとビルドのチェック
+npm run lint && npm run build
+```
+
+### Pull Request
+- **CI:** Pull Requestは、CI（ビルド＆lint）のチェックをすべてパスする必要があります。
+
+### APIデータ
+- **型定義:** APIのデータ構造は `/contracts` ディレクトリで管理します。
+- **モックデータ:** 開発用のモックデータは `/mocks` ディレクトリに配置します。
+- **バックエンド接続:** 将来的にバックエンドAPIを呼び出す際は、`.env.local` に定義した `API_BASE_URL` を経由して接続します。
 

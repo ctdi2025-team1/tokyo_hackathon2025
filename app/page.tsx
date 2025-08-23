@@ -25,6 +25,7 @@ import {
 import Chat from './components/Chat';
 import EventList from './components/EventList';
 import KpiCards from './components/KpiCards';
+import GarbageCard from '../src/components/GarbageCard';
 
 interface ScrollToTopProps {
   children: React.ReactElement;
@@ -186,6 +187,11 @@ export default function Home() {
           }}
         >
           <KpiCards />
+          
+          {/* Garbage Card */}
+          <Box mt={4}>
+            <GarbageCard />
+          </Box>
         </Paper>
 
 
@@ -219,9 +225,6 @@ export default function Home() {
         <Box mt={8} pt={4} borderTop={1} borderColor="divider">
           <Typography variant="body2" color="text.secondary" textAlign="center" mb={2}>
             © 2025 渋谷ダッシュボード - 公式オープンデータに基づく環境・イベント情報
-          </Typography>
-          <Typography variant="caption" color="text.secondary" textAlign="center" display="block">
-            データ出典: SHIBUYA OPEN DATA, 墨田区オープンデータ, 中央区オープンデータ, 東京ビッグサイト
           </Typography>
         </Box>
       </Container>
