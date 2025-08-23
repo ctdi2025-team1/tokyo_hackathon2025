@@ -4,6 +4,8 @@ const API_URL =
 const D = 10; // 昼間時間（8:00–17:59）
 const N = 14; // 夜間時間（18:00–7:59）
 
+const THIS_YEAR = 2025;
+
 // ==== 1. 昼夜人口を使って1日平均人口を計算 ====
 function calcDailyAveragePopulation(dayPop: number, nightPop: number): number {
     return (dayPop * D + nightPop * N) / 24;
@@ -18,12 +20,13 @@ function convertToGPerPersonPerDay(totalG: number, dailyAvgPop: number): number 
 export async function getKPIShibuya(): Promise<{
     household_gpd: number;
     delta_household: number;
+    yearlyTotal: number;
     lastUpdated: string;
 }> {
     // a. 昼夜人口（e-Statなどから取得する想定。今はダミー）
     // cf: https://www.e-stat.go.jp/dbview?sid=0004003060
-    const dayPop = 400000;
-    const nightPop = 200000;
+    const dayPop = 550000;
+    const nightPop = 230000;
     const dailyAvgPop = calcDailyAveragePopulation(dayPop, nightPop);
 
     // b. ArcGIS APIからごみ排出データを取得
@@ -52,19 +55,30 @@ export async function getKPIShibuya(): Promise<{
         household_gpd -
         convertToGPerPersonPerDay(previous.amountTon * 1_000_000, dailyAvgPop);
 
+    // 年ごとに累積
+    const yearlyTotals: Record<number, number> = {};
+
+    for (const item of rawData) {
+        if (!yearlyTotals[item.year]) {
+            yearlyTotals[item.year] = 0;
+        }
+        yearlyTotals[item.year] += item.amountTon;
+    }
+
     return {
         household_gpd,
         delta_household,
+        yearlyTotal: yearlyTotals[THIS_YEAR],
         lastUpdated: latest.date,
     };
 }
 
 // ==== 4. ArcGIS API 呼び出し ====
 async function fetchGarbageData(): Promise<
-    { date: string; amountTon: number; type: string }[]
+    { date: string; year: number; amountTon: number; type: string }[]
 > {
     const params = new URLSearchParams({
-        where: "年=2025",
+        where: `年=${THIS_YEAR}`,
         outFields: "*",
         f: "json",
     });
@@ -74,6 +88,7 @@ async function fetchGarbageData(): Promise<
 
     return json.features.map((f: any) => ({
         date: f.attributes["日付"], // 例: "2015/4/1"
+        year: Number(f.attributes["年"]),
         amountTon: Number(f.attributes["ごみ収集量_ton"]),
         type: f.attributes["ごみ種類"],
     }));

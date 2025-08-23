@@ -7,6 +7,7 @@ import { getKPIShibuya } from "@/lib/kpi";
 type WasteData = {
     household_gpd: number;
     delta_household: number;
+    yearlyTotal: number;
     lastUpdated: string;
 };
 
@@ -33,6 +34,7 @@ export default function ShibuyaKPIPage() {
                         <th className="border border-gray-300 px-4 py-2">最新収集日</th>
                         <th className="border border-gray-300 px-4 py-2">ごみ量 (g/人・日)</th>
                         <th className="border border-gray-300 px-4 py-2">前回との差分 (g/人・日)</th>
+                        <th className="border border-gray-300 px-4 py-2">累積 (トン)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,6 +42,7 @@ export default function ShibuyaKPIPage() {
                         <td className="border border-gray-300 px-4 py-2">{data.lastUpdated}</td>
                         <td className="border border-gray-300 px-4 py-2">{Math.round(data.household_gpd)}</td>
                         <td className="border border-gray-300 px-4 py-2">{Math.round(data.delta_household)}</td>
+                        <td className="border border-gray-300 px-4 py-2">{Math.round(data.yearlyTotal)}</td>
                     </tr>
                 </tbody>
             </table>
