@@ -25,7 +25,6 @@ import {
 import Chat from './components/Chat';
 import EventList from './components/EventList';
 import KpiCards from './components/KpiCards';
-import ResourcePieChart from './components/ResourceChips';
 
 interface ScrollToTopProps {
   children: React.ReactElement;
@@ -189,20 +188,6 @@ export default function Home() {
           <KpiCards />
         </Paper>
 
-        {/* Resource Breakdown Section */}
-        <Paper 
-          id="resource-section" 
-          elevation={1} 
-          sx={{ 
-            p: 4, 
-            mb: 4, 
-            background: 'linear-gradient(135deg, rgba(255, 64, 129, 0.03) 0%, rgba(255, 128, 171, 0.08) 100%)',
-            borderRadius: 3,
-            border: '1px solid rgba(255, 64, 129, 0.12)',
-          }}
-        >
-          <ResourcePieChart title="資源ごみ内訳" />
-        </Paper>
 
         <Divider sx={{ my: 4 }} />
 
