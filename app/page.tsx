@@ -24,7 +24,6 @@ import {
 
 import Chat from './components/Chat';
 import EventList from './components/EventList';
-import KpiCards from './components/KpiCards';
 import GarbageCard from '../src/components/GarbageCard';
 
 interface ScrollToTopProps {
@@ -186,8 +185,6 @@ export default function Home() {
             border: '1px solid rgba(25, 118, 210, 0.12)',
           }}
         >
-          <KpiCards />
-          
           {/* Garbage Card */}
           <Box mt={4}>
             <GarbageCard />

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export interface Event {
   id: string;
@@ -220,7 +220,7 @@ const sortEvents = (events: Event[]): Event[] => {
   });
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Add artificial delay to simulate API calls
     await new Promise(resolve => setTimeout(resolve, 1000));

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 interface KpiData {
   household_gpd: number;
@@ -50,7 +50,7 @@ const generateMockKpiData = (): KpiData => {
   };
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Add artificial delay to simulate API call
     await new Promise(resolve => setTimeout(resolve, 800));

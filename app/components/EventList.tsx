@@ -23,6 +23,7 @@ import {
   Refresh,
   OpenInNew,
 } from '@mui/icons-material';
+import { formatTimeHHmm, formatIsoToShortJP } from '../../src/utils/date';
 
 export interface Event {
   id: string;
@@ -187,19 +188,9 @@ const EventList: React.FC<EventListProps> = ({ maxItems = 20 }) => {
     fetchEvents();
   }, [fetchEvents]);
 
-  const formatTime = (time: string) => {
-    return time.substring(0, 5); // HH:mm format
-  };
+  const formatTime = (time: string) => formatTimeHHmm(time);
 
-  const formatLastUpdated = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('ja-JP', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatLastUpdated = (isoString: string) => formatIsoToShortJP(isoString);
 
   const getSourceLabel = (source: string) => {
     const labels = {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { Event as TodayEvent } from '../events/today/route';
 
 interface ChatMessage {
   message: string;
@@ -12,12 +13,12 @@ interface ChatResponse {
 }
 
 // Mock tool functions that would call our APIs
-const getEventsToday = async () => {
+const getEventsToday = async (): Promise<TodayEvent[]> => {
   try {
     // In a real implementation, this would call our events API
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/today`);
     const data = await response.json();
-    return data.events || [];
+    return (data.events || []) as TodayEvent[];
   } catch (error) {
     console.error('Failed to fetch events:', error);
     return [];
@@ -94,7 +95,7 @@ const generateResponse = async (message: string, intent: string): Promise<ChatRe
   switch (intent) {
     case 'events': {
       toolsUsed.push('getEventsToday');
-      const events = await getEventsToday();
+      const events: TodayEvent[] = await getEventsToday();
       
       if (events.length === 0) {
         return {
@@ -105,7 +106,7 @@ const generateResponse = async (message: string, intent: string): Promise<ChatRe
         };
       }
       
-      const familyEvents = events.filter((event: any) => event.forFamily);
+      const familyEvents = events.filter((event: TodayEvent) => event.forFamily);
       const allEventsCount = events.length;
       const familyEventsCount = familyEvents.length;
       
@@ -113,7 +114,7 @@ const generateResponse = async (message: string, intent: string): Promise<ChatRe
       
       if (familyEventsCount > 0) {
         response += `そのうち親子向けのイベントは${familyEventsCount}件です。\n\n主な親子向けイベント:\n`;
-        familyEvents.slice(0, 3).forEach((event: any, index: number) => {
+        familyEvents.slice(0, 3).forEach((event: TodayEvent, index: number) => {
           response += `${index + 1}. ${event.title}`;
           if (event.startTime) response += ` (${event.startTime}開始)`;
           if (event.ward) response += ` - ${event.ward}`;

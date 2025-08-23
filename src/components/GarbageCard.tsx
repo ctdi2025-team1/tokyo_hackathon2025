@@ -25,6 +25,7 @@ import {
   formatDelta,
   TARGET_PER_CAPITA_PER_DAY,
 } from '../utils/garbage';
+import { formatIsoToDateTimeJP } from '../utils/date';
 
 interface PerCapitaData {
   name: string;
@@ -106,17 +107,8 @@ const GarbageCard: React.FC = () => {
   // Always use green for target line and label for better recognition
   const lineColor = theme.palette.success.main;
 
-  const formatLastUpdated = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleDateString('ja-JP', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'Asia/Tokyo',
-    });
-  };
+  // 最終更新日の表示（共通ユーティリティを使用）
+  const formatLastUpdated = (isoString: string) => formatIsoToDateTimeJP(isoString);
 
   return (
     <Card elevation={2} sx={{ borderRadius: 2 }}>
