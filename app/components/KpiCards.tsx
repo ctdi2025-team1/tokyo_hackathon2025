@@ -1,25 +1,26 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+// biome-ignore assist/source/organizeImports: <explanation>
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Alert,
+  Box,
+  Button,
   Card,
   CardContent,
-  Typography,
-  Box,
   Chip,
-  Button,
   CircularProgress,
-  Alert,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import {
-  TrendingUp,
-  TrendingDown,
-  Remove,
-  Refresh,
   Info,
+  Refresh,
+  Remove,
+  TrendingDown,
+  TrendingUp,
 } from '@mui/icons-material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
 interface KpiData {
   household_gpd: number;
@@ -239,27 +240,20 @@ const KpiCards: React.FC = () => {
         <Box sx={{ width: '100%' }}>
           <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
             {/* 家庭ごみカード */}
-            <Card sx={{ 
-              flex: 1, 
-              background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%)', 
-              color: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(255, 107, 107, 0.3)',
-              border: 'none',
-            }}>
+            <Card sx={{ flex: 1, border: '2px solid #ff6b6b', borderRadius: '12px' }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                  <Typography variant="h6" component="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
+                  <Typography variant="h6" component="h3" sx={{ color: '#ff6b6b', fontWeight: 'bold' }}>
                     🏠 家庭ごみ
                   </Typography>
                   <Tooltip title="目標: 250g/人・日（2033年まで）">
-                    <Info fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} />
+                    <Info fontSize="small" color="action" />
                   </Tooltip>
                 </Box>
                 
-                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: 'white' }}>
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
                   {kpiData.household_gpd.toFixed(1)}
-                  <Typography variant="body2" component="span" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} ml={1}>
+                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
                     g/人・日
                   </Typography>
                 </Typography>
@@ -269,49 +263,34 @@ const KpiCards: React.FC = () => {
                     icon={getTrendIcon(kpiData.deltas.household)}
                     label={`前回より ${kpiData.deltas.household > 0 ? '+' : ''}${kpiData.deltas.household.toFixed(1)}g`}
                     size="small"
-                    sx={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'white',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                      '& .MuiChip-icon': { color: 'white' }
-                    }}
+                    color={getTrendColor(kpiData.deltas.household)}
                     variant="outlined"
                   />
                   <Chip
                     label={`目標まで あと${(kpiData.household_gpd - 250).toFixed(1)}g`}
                     size="small"
-                    sx={{ 
-                      backgroundColor: kpiData.household_gpd <= 250 ? 'rgba(76, 175, 80, 0.9)' : 'rgba(255, 193, 7, 0.9)',
-                      color: 'white',
-                      fontWeight: 'bold',
-                    }}
+                    color={kpiData.household_gpd <= 250 ? 'success' : 'warning'}
+                    variant="filled"
                   />
                 </Box>
               </CardContent>
             </Card>
 
             {/* 資源回収カード */}
-            <Card sx={{ 
-              flex: 1, 
-              background: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)', 
-              color: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 8px 32px rgba(78, 205, 196, 0.3)',
-              border: 'none',
-            }}>
+            <Card sx={{ flex: 1, border: '2px solid #4ecdc4', borderRadius: '12px' }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                  <Typography variant="h6" component="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
+                  <Typography variant="h6" component="h3" sx={{ color: '#4ecdc4', fontWeight: 'bold' }}>
                     ♻️ 資源回収
                   </Typography>
                   <Tooltip title="目標: 150g/人・日（リサイクル率向上）">
-                    <Info fontSize="small" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} />
+                    <Info fontSize="small" color="action" />
                   </Tooltip>
                 </Box>
                 
-                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: 'white' }}>
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
                   {kpiData.recycling_gpd.toFixed(1)}
-                  <Typography variant="body2" component="span" sx={{ color: 'rgba(255, 255, 255, 0.8)' }} ml={1}>
+                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
                     g/人・日
                   </Typography>
                 </Typography>
@@ -321,22 +300,14 @@ const KpiCards: React.FC = () => {
                     icon={getTrendIcon(kpiData.deltas.recycling)}
                     label={`前回より ${kpiData.deltas.recycling > 0 ? '+' : ''}${kpiData.deltas.recycling.toFixed(1)}g`}
                     size="small"
-                    sx={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'white',
-                      border: '1px solid rgba(255, 255, 255, 0.3)',
-                      '& .MuiChip-icon': { color: 'white' }
-                    }}
+                    color={kpiData.deltas.recycling > 0 ? 'success' : 'error'}
                     variant="outlined"
                   />
                   <Chip
                     label={`目標まで ${kpiData.recycling_gpd >= 150 ? '達成' : `あと${(150 - kpiData.recycling_gpd).toFixed(1)}g`}`}
                     size="small"
-                    sx={{ 
-                      backgroundColor: kpiData.recycling_gpd >= 150 ? 'rgba(76, 175, 80, 0.9)' : 'rgba(33, 150, 243, 0.9)',
-                      color: 'white',
-                      fontWeight: 'bold',
-                    }}
+                    color={kpiData.recycling_gpd >= 150 ? 'success' : 'info'}
+                    variant="filled"
                   />
                 </Box>
               </CardContent>
