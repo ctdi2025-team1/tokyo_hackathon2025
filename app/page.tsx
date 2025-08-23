@@ -1,5 +1,6 @@
 'use client';
 
+// biome-ignore assist/source/organizeImports: manual import order for readability
 import type React from 'react';
 import { useState } from 'react';
 
@@ -71,9 +72,7 @@ export default function Home() {
     }
   };
 
-  const handleResourceChipClick = () => {
-    scrollToSection('resource-section');
-  };
+
 
   return (
     <>
@@ -91,7 +90,7 @@ export default function Home() {
         <Toolbar>
           <Dashboard sx={{ mr: 2 }} color="primary" />
           <Typography variant="h6" component="h1" sx={{ flexGrow: 1, fontWeight: 'medium' }}>
-            渋谷ダッシュボード
+          （仮）「渋谷ダッシュボード＋イベント」
           </Typography>
           <Box display={{ xs: 'none', sm: 'flex' }} gap={2}>
             <Typography
@@ -106,7 +105,7 @@ export default function Home() {
                 color: 'inherit',
               }}
             >
-              環境KPI
+              先週のゴミの量を確認
             </Typography>
             <Typography
               component="button"
@@ -157,7 +156,7 @@ export default function Home() {
             渋谷区 環境＆イベント情報
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-            家庭ごみ・資源回収の最新KPIと今日開催中の親子向けイベントを一覧できるダッシュボード
+            今出ているゴミと削減目標を確認しよう！
           </Typography>
         </Box>
 
@@ -172,7 +171,7 @@ export default function Home() {
             borderRadius: 3,
           }}
         >
-          <KpiCards onResourceChipClick={handleResourceChipClick} />
+          <KpiCards />
         </Paper>
 
         {/* Resource Breakdown Section */}

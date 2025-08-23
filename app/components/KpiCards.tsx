@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -19,28 +19,27 @@ import {
   Refresh,
   Info,
 } from '@mui/icons-material';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 interface KpiData {
-  household_gpd: number;
-  recycling_gpd: number;
+  burnable_gpd: number;
+  non_burnable_gpd: number;
+  bulky_gpd: number;
   deltas: {
-    household: number;
-    recycling: number;
+    burnable: number;
+    non_burnable: number;
+    bulky: number;
   };
   lastUpdated: string;
   sources: string[];
 }
 
-interface KpiCardsProps {
-  onResourceChipClick?: (category: string) => void;
-}
-
-const KpiCards: React.FC<KpiCardsProps> = ({ onResourceChipClick }) => {
+const KpiCards: React.FC = () => {
   const [kpiData, setKpiData] = useState<KpiData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchKpiData = async () => {
+  const fetchKpiData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -49,13 +48,15 @@ const KpiCards: React.FC<KpiCardsProps> = ({ onResourceChipClick }) => {
       // const response = await fetch('/api/kpi/shibuya');
       // const data = await response.json();
       
-      // Mock data for development
+      // Mock data for development with zero values as requested
       const mockData: KpiData = {
-        household_gpd: 315.7,
-        recycling_gpd: 127.3,
+        burnable_gpd: 0,
+        non_burnable_gpd: 0,
+        bulky_gpd: 0,
         deltas: {
-          household: -12.4,
-          recycling: 8.9,
+          burnable: 0,
+          non_burnable: 0,
+          bulky: 0,
         },
         lastUpdated: new Date().toISOString(),
         sources: [
@@ -72,11 +73,11 @@ const KpiCards: React.FC<KpiCardsProps> = ({ onResourceChipClick }) => {
       setError('データの取得に失敗しました');
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchKpiData();
-  }, []);
+  }, [fetchKpiData]);
 
   const getTrendIcon = (delta: number) => {
     if (delta > 0) return <TrendingUp color="error" fontSize="small" />;
@@ -84,15 +85,10 @@ const KpiCards: React.FC<KpiCardsProps> = ({ onResourceChipClick }) => {
     return <Remove color="disabled" fontSize="small" />;
   };
 
-  const getTrendColor = (delta: number, isRecycling = false) => {
+  const getTrendColor = (delta: number) => {
     if (delta === 0) return 'default';
-    // For household waste, decrease is good (success), increase is bad (error)
-    // For recycling, increase is good (success), decrease is bad (warning)
-    if (isRecycling) {
-      return delta > 0 ? 'success' : 'warning';
-    } else {
-      return delta > 0 ? 'error' : 'success';
-    }
+    // For both household and business waste, decrease is good (success), increase is bad (error)
+    return delta > 0 ? 'error' : 'success';
   };
 
   const formatLastUpdated = (isoString: string) => {
@@ -131,11 +127,39 @@ const KpiCards: React.FC<KpiCardsProps> = ({ onResourceChipClick }) => {
 
   if (!kpiData) return null;
 
+  // Chart data for bar visualization with targets for each waste type
+  const chartData = [
+    {
+      name: '🔥 燃えるごみ',
+      value: kpiData.burnable_gpd,
+      target: 400,
+      delta: kpiData.deltas.burnable,
+      color: '#ff6b6b',
+      targetColor: '#ff8e53'
+    },
+    {
+      name: '🧱 燃えないごみ',
+      value: kpiData.non_burnable_gpd,
+      target: 50,
+      delta: kpiData.deltas.non_burnable,
+      color: '#4ecdc4',
+      targetColor: '#45b7aa'
+    },
+    {
+      name: '📦 粗大ゴミ',
+      value: kpiData.bulky_gpd,
+      target: 30,
+      delta: kpiData.deltas.bulky,
+      color: '#ffe66d',
+      targetColor: '#ffb74d'
+    }
+  ];
+
   return (
     <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" component="h2" fontWeight="medium">
-          渋谷区 環境KPI
+          渋谷区 環境データ
         </Typography>
         <Box display="flex" alignItems="center" gap={1}>
           <Typography variant="caption" color="text.secondary">
@@ -153,77 +177,187 @@ const KpiCards: React.FC<KpiCardsProps> = ({ onResourceChipClick }) => {
         </Box>
       </Box>
 
-      <Box display="flex" gap={2} sx={{ overflowX: 'auto', pb: 2 }}>
-        {/* 家庭ごみカード */}
-        <Card sx={{ minWidth: 280, flex: '1 1 auto' }}>
-          <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-              <Typography variant="h6" component="h3" color="text.secondary">
-                家庭ごみ
-              </Typography>
-              <Tooltip title="2033年目標: 250 g/人・日（渋谷区基本計画）">
-                <Info fontSize="small" color="action" />
-              </Tooltip>
-            </Box>
-            
-            <Typography variant="h4" component="div" fontWeight="bold" mb={1}>
-              {kpiData.household_gpd.toFixed(1)}
-              <Typography variant="body2" component="span" color="text.secondary" ml={1}>
-                g/人・日
-              </Typography>
+      {/* Main Chart Section */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+            <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', color: '#2d3748' }}>
+              🗂️ ゴミダッシュボード
             </Typography>
-
-            <Box display="flex" alignItems="center" gap={1}>
-              <Chip
-                icon={getTrendIcon(kpiData.deltas.household)}
-                label={`前回差 ${kpiData.deltas.household > 0 ? '+' : ''}${kpiData.deltas.household.toFixed(1)}g`}
-                size="small"
-                color={getTrendColor(kpiData.deltas.household)}
-                variant="outlined"
-              />
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* 資源回収量カード */}
-        <Card sx={{ minWidth: 280, flex: '1 1 auto' }}>
-          <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-              <Typography variant="h6" component="h3" color="text.secondary">
-                資源回収量
-              </Typography>
-              <Button
-                size="small"
-                variant="text"
-                onClick={() => onResourceChipClick?.('all')}
-                aria-label="資源内訳を表示"
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
+              ゴミの量(t)
+            </Typography>
+          </Box>
+          
+          <Box sx={{ width: '100%', height: 350 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                layout="horizontal"
+                data={chartData}
+                margin={{
+                  top: 20,
+                  right: 100,
+                  left: 80,
+                  bottom: 30,
+                }}
+                barCategoryGap="30%"
               >
-                内訳 →
-              </Button>
-            </Box>
-            
-            <Typography variant="h4" component="div" fontWeight="bold" mb={1}>
-              {kpiData.recycling_gpd.toFixed(1)}
-              <Typography variant="body2" component="span" color="text.secondary" ml={1}>
-                g/人・日
-              </Typography>
-            </Typography>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  type="number"
+                  tick={{ fontSize: 12 }}
+                  label={{ value: 't', position: 'insideBottom', offset: -10 }}
+                  domain={[0, 450]}
+                />
+                <YAxis 
+                  type="category"
+                  dataKey="name" 
+                  tick={{ fontSize: 12 }}
+                  width={70}
+                />
+                <Bar 
+                  dataKey="value" 
+                  fill="#4299e1"
+                  radius={[0, 8, 8, 0]}
+                  name="現在の量"
+                />
+                <Bar 
+                  dataKey="target" 
+                  fill="#a0aec0"
+                  radius={[0, 8, 8, 0]}
+                  name="目標"
+                  fillOpacity={0.8}
+                  stroke="#718096"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
+        </CardContent>
+      </Card>
 
-            <Box display="flex" alignItems="center" gap={1}>
-              <Chip
-                icon={getTrendIcon(kpiData.deltas.recycling)}
-                label={`前回差 ${kpiData.deltas.recycling > 0 ? '+' : ''}${kpiData.deltas.recycling.toFixed(1)}g`}
-                size="small"
-                color={getTrendColor(kpiData.deltas.recycling, true)}
-                variant="outlined"
-              />
-            </Box>
-          </CardContent>
-        </Card>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 3 }}>
+
+        {/* KPI Cards */}
+        <Box sx={{ width: '100%' }}>
+          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
+            {/* 可燃ごみカード */}
+            <Card sx={{ flex: 1, border: '2px solid #ff6b6b', borderRadius: '12px' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                  <Typography variant="h6" component="h3" sx={{ color: '#ff6b6b', fontWeight: 'bold' }}>
+                    🔥 燃えるごみ
+                  </Typography>
+                  <Tooltip title="目標: 400g">
+                    <Info fontSize="small" color="action" />
+                  </Tooltip>
+                </Box>
+                
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
+                  {kpiData.burnable_gpd.toFixed(1)}
+                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
+                    グラム
+                  </Typography>
+                </Typography>
+
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                  <Chip
+                    icon={getTrendIcon(kpiData.deltas.burnable)}
+                    label={`前回より ${kpiData.deltas.burnable > 0 ? '+' : ''}${kpiData.deltas.burnable.toFixed(1)}g`}
+                    size="small"
+                    color={getTrendColor(kpiData.deltas.burnable)}
+                    variant="outlined"
+                  />
+                  <Chip
+                    label={`目標まで あと${(400 - kpiData.burnable_gpd).toFixed(1)}g`}
+                    size="small"
+                    color={kpiData.burnable_gpd <= 400 ? 'success' : 'warning'}
+                    variant="filled"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* 不燃ごみカード */}
+            <Card sx={{ flex: 1, border: '2px solid #4ecdc4', borderRadius: '12px' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                  <Typography variant="h6" component="h3" sx={{ color: '#4ecdc4', fontWeight: 'bold' }}>
+                    🧱 燃えないごみ
+                  </Typography>
+                  <Tooltip title="目標: 50g">
+                    <Info fontSize="small" color="action" />
+                  </Tooltip>
+                </Box>
+                
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
+                  {kpiData.non_burnable_gpd.toFixed(1)}
+                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
+                    グラム
+                  </Typography>
+                </Typography>
+
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                  <Chip
+                    icon={getTrendIcon(kpiData.deltas.non_burnable)}
+                    label={`前回より ${kpiData.deltas.non_burnable > 0 ? '+' : ''}${kpiData.deltas.non_burnable.toFixed(1)}g`}
+                    size="small"
+                    color={getTrendColor(kpiData.deltas.non_burnable)}
+                    variant="outlined"
+                  />
+                  <Chip
+                    label={`目標まで あと${(50 - kpiData.non_burnable_gpd).toFixed(1)}g`}
+                    size="small"
+                    color={kpiData.non_burnable_gpd <= 50 ? 'success' : 'warning'}
+                    variant="filled"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* 粗大ごみカード */}
+            <Card sx={{ flex: 1, border: '2px solid #ffe66d', borderRadius: '12px' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                  <Typography variant="h6" component="h3" sx={{ color: '#ff8f00', fontWeight: 'bold' }}>
+                    📦 粗大ごみ
+                  </Typography>
+                  <Tooltip title="目標: 30g">
+                    <Info fontSize="small" color="action" />
+                  </Tooltip>
+                </Box>
+                
+                <Typography variant="h4" component="div" fontWeight="bold" mb={1} sx={{ color: '#2d3748' }}>
+                  {kpiData.bulky_gpd.toFixed(1)}
+                  <Typography variant="body2" component="span" color="text.secondary" ml={1}>
+                    グラム
+                  </Typography>
+                </Typography>
+
+                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                  <Chip
+                    icon={getTrendIcon(kpiData.deltas.bulky)}
+                    label={`前回より ${kpiData.deltas.bulky > 0 ? '+' : ''}${kpiData.deltas.bulky.toFixed(1)}g`}
+                    size="small"
+                    color={getTrendColor(kpiData.deltas.bulky)}
+                    variant="outlined"
+                  />
+                  <Chip
+                    label={`目標まで あと${(30 - kpiData.bulky_gpd).toFixed(1)}g`}
+                    size="small"
+                    color={kpiData.bulky_gpd <= 30 ? 'success' : 'warning'}
+                    variant="filled"
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
       </Box>
 
       {/* 出典リンク */}
-      <Box mt={2}>
+      <Box mt={3}>
         <Typography variant="caption" color="text.secondary">
           データ出典:
           {kpiData.sources.map((source, index) => (
