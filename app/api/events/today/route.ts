@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 
+interface GarbageInfo {
+  goal?: number; // Reduction goal in kg
+  lastYearEmissions?: number; // in kg
+  thisYearEmissions?: number; // in kg
+}
+
 export interface Event {
   id: string;
   source: 'sumida' | 'chuo' | 'bigsight';
@@ -20,6 +26,8 @@ export interface Event {
   fee?: 'free' | 'paid' | 'mixed' | null;
   url?: string;
   updatedAt?: string;
+  garbageInfo?: GarbageInfo;
+  attributes?: string[];
 }
 
 interface EventsResponse {
@@ -60,7 +68,7 @@ const isFamilyFriendly = (title: string, description?: string, tags?: string[]):
 };
 
 // Generate mock events for development
-const generateMockEvents = (): Event[] => {
+export const generateMockEvents = (): Event[] => {
   const today = getTodayJST();
   
   const mockEvents: Event[] = [
@@ -81,6 +89,12 @@ const generateMockEvents = (): Event[] => {
       fee: 'free',
       tags: ['親子', '科学', '体験', '小学生'],
       url: 'https://www.city.sumida.lg.jp/kuseijoho/event/',
+      garbageInfo: {
+        goal: 50, // 50kg削減目標
+        lastYearEmissions: 200,
+        thisYearEmissions: 140, // 60kg削減達成
+      },
+      attributes: ['屋内', '混雑'],
     },
     {
       id: 'chuo:002',
@@ -99,6 +113,10 @@ const generateMockEvents = (): Event[] => {
       fee: 'free',
       tags: ['ベビーカー', '散歩', '歴史', 'ガイドツアー'],
       url: 'https://www.city.chuo.lg.jp/event/',
+      garbageInfo: {
+        goal: 20,
+      },
+      attributes: ['屋外', '飲食なし'],
     },
     {
       id: 'bigsight:003',
@@ -117,6 +135,12 @@ const generateMockEvents = (): Event[] => {
       fee: 'paid',
       tags: ['キッズ', 'フェスタ', '大型イベント', 'ワークショップ'],
       url: 'https://www.bigsight.jp/visitor/event/',
+      garbageInfo: {
+        goal: 100,
+        lastYearEmissions: 500,
+        thisYearEmissions: 420, // 80kg削減、目標未達
+      },
+      attributes: ['物販多め'],
     },
     {
       id: 'sumida:004',
